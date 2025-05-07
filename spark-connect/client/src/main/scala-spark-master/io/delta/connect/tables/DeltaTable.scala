@@ -67,6 +67,46 @@ class DeltaTable private[tables](
    */
   def toDF: Dataset[Row] = df
 
+  private def executeVacuum(retentionHours: Option[Double]): DataFrame = {
+    val vacuum = proto.VacuumTable
+      .newBuilder()
+      .setTable(table)
+    retentionHours.foreach(vacuum.setRetentionHours)
+    val command = proto.DeltaCommand
+      .newBuilder()
+      .setVacuumTable(vacuum)
+      .build()
+    execute(command)
+    sparkSession.emptyDataFrame
+  }
+
+  /**
+   * Recursively delete files and directories in the table that are not needed by the table for
+   * maintaining older versions up to the given retention threshold. This method will return an
+   * empty DataFrame on successful completion.
+   *
+   * @param retentionHours The retention threshold in hours. Files required by the table for
+   *                       reading versions earlier than this will be preserved and the
+   *                       rest of them will be deleted.
+   * @since 2.4.0
+   */
+  def vacuum(retentionHours: Double): DataFrame = {
+    executeVacuum(Some(retentionHours))
+  }
+
+  /**
+   * Recursively delete files and directories in the table that are not needed by the table for
+   * maintaining older versions up to the given retention threshold. This method will return an
+   * empty DataFrame on successful completion.
+   *
+   * note: This will use the default retention period of 7 days.
+   *
+   * @since 2.4.0
+   */
+  def vacuum(): DataFrame = {
+    executeVacuum(None)
+  }
+
   /**
    * Helper method for the history APIs.
    *
@@ -444,6 +484,54 @@ class DeltaTable private[tables](
    */
   private def toStrColumnMap(map: Map[String, String]): Map[String, Column] = {
     map.toSeq.map { case (k, v) => k -> functions.expr(v) }.toMap
+  }
+
+  /**
+   * Generate a manifest for the given Delta Table
+   *
+   * @param mode Specifies the mode for the generation of the manifest.
+   *             The valid modes are as follows (not case sensitive):
+   *              - "symlink_format_manifest" : This will generate manifests in symlink format
+   *                for Presto and Athena read support.
+   *                See the online documentation for more information.
+   * @since 2.5.0
+   */
+  def generate(mode: String): Unit = {
+    val generate = proto.Generate
+      .newBuilder()
+      .setTable(table)
+      .setMode(mode)
+    val command = proto.DeltaCommand.newBuilder().setGenerate(generate).build()
+    execute(command)
+  }
+
+  /**
+   * Updates the protocol version of the table to leverage new features. Upgrading the reader
+   * version will prevent all clients that have an older version of Delta Lake from accessing this
+   * table. Upgrading the writer version will prevent older versions of Delta Lake to write to this
+   * table. The reader or writer version cannot be downgraded.
+   *
+   * See online documentation and Delta's protocol specification at PROTOCOL.md for more details.
+   *
+   * @since 2.5.0
+   */
+  def upgradeTableProtocol(readerVersion: Int, writerVersion: Int): Unit = {
+    val upgrade = proto.UpgradeTableProtocol
+      .newBuilder()
+      .setTable(table)
+      .setReaderVersion(readerVersion)
+      .setWriterVersion(writerVersion)
+    val command = proto.DeltaCommand.newBuilder().setUpgradeTableProtocol(upgrade).build()
+    execute(command)
+  }
+
+  private def execute(command: proto.DeltaCommand): Unit = {
+    val extension = com.google.protobuf.Any.pack(command)
+    val sparkCommand = spark_proto.Command
+      .newBuilder()
+      .setExtension(extension)
+      .build()
+    sparkSession.execute(sparkCommand)
   }
 }
 
