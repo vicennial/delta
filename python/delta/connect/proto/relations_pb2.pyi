@@ -31,7 +31,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 import builtins
 import collections.abc
 import delta.connect.proto.proto.base_pb2
@@ -41,11 +40,15 @@ import google.protobuf.message
 import pyspark.sql.connect.proto.expressions_pb2
 import pyspark.sql.connect.proto.relations_pb2
 import pyspark.sql.connect.proto.types_pb2
-import typing
+import sys
+
+if sys.version_info >= (3, 8):
+    import typing as typing_extensions
+else:
+    import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
-@typing.final
 class DeltaRelation(google.protobuf.message.Message):
     """Message to hold all relation extensions in Delta Connect."""
 
@@ -89,7 +92,7 @@ class DeltaRelation(google.protobuf.message.Message):
     ) -> None: ...
     def HasField(
         self,
-        field_name: typing.Literal[
+        field_name: typing_extensions.Literal[
             "convert_to_delta",
             b"convert_to_delta",
             "delete_from_table",
@@ -112,7 +115,7 @@ class DeltaRelation(google.protobuf.message.Message):
     ) -> builtins.bool: ...
     def ClearField(
         self,
-        field_name: typing.Literal[
+        field_name: typing_extensions.Literal[
             "convert_to_delta",
             b"convert_to_delta",
             "delete_from_table",
@@ -134,9 +137,9 @@ class DeltaRelation(google.protobuf.message.Message):
         ],
     ) -> None: ...
     def WhichOneof(
-        self, oneof_group: typing.Literal["relation_type", b"relation_type"]
+        self, oneof_group: typing_extensions.Literal["relation_type", b"relation_type"]
     ) -> (
-        typing.Literal[
+        typing_extensions.Literal[
             "scan",
             "describe_history",
             "describe_detail",
@@ -151,7 +154,6 @@ class DeltaRelation(google.protobuf.message.Message):
 
 global___DeltaRelation = DeltaRelation
 
-@typing.final
 class Scan(google.protobuf.message.Message):
     """Relation that reads from a Delta table."""
 
@@ -166,12 +168,13 @@ class Scan(google.protobuf.message.Message):
         *,
         table: delta.connect.proto.base_pb2.DeltaTable | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["table", b"table"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["table", b"table"]) -> None: ...
+    def HasField(
+        self, field_name: typing_extensions.Literal["table", b"table"]
+    ) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["table", b"table"]) -> None: ...
 
 global___Scan = Scan
 
-@typing.final
 class DescribeHistory(google.protobuf.message.Message):
     """Relation containing information of the latest commits on a Delta table.
     The information is in reverse chronological order.
@@ -188,12 +191,13 @@ class DescribeHistory(google.protobuf.message.Message):
         *,
         table: delta.connect.proto.base_pb2.DeltaTable | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["table", b"table"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["table", b"table"]) -> None: ...
+    def HasField(
+        self, field_name: typing_extensions.Literal["table", b"table"]
+    ) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["table", b"table"]) -> None: ...
 
 global___DescribeHistory = DescribeHistory
 
-@typing.final
 class DescribeDetail(google.protobuf.message.Message):
     """Relation containing the details of a Delta table such as the format, name, and size."""
 
@@ -208,12 +212,13 @@ class DescribeDetail(google.protobuf.message.Message):
         *,
         table: delta.connect.proto.base_pb2.DeltaTable | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["table", b"table"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["table", b"table"]) -> None: ...
+    def HasField(
+        self, field_name: typing_extensions.Literal["table", b"table"]
+    ) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["table", b"table"]) -> None: ...
 
 global___DescribeDetail = DescribeDetail
 
-@typing.final
 class ConvertToDelta(google.protobuf.message.Message):
     """Command that turns a Parquet table into a Delta table.
 
@@ -243,7 +248,7 @@ class ConvertToDelta(google.protobuf.message.Message):
     ) -> None: ...
     def HasField(
         self,
-        field_name: typing.Literal[
+        field_name: typing_extensions.Literal[
             "partition_schema",
             b"partition_schema",
             "partition_schema_string",
@@ -254,7 +259,7 @@ class ConvertToDelta(google.protobuf.message.Message):
     ) -> builtins.bool: ...
     def ClearField(
         self,
-        field_name: typing.Literal[
+        field_name: typing_extensions.Literal[
             "identifier",
             b"identifier",
             "partition_schema",
@@ -266,12 +271,11 @@ class ConvertToDelta(google.protobuf.message.Message):
         ],
     ) -> None: ...
     def WhichOneof(
-        self, oneof_group: typing.Literal["partition_schema", b"partition_schema"]
-    ) -> typing.Literal["partition_schema_string", "partition_schema_struct"] | None: ...
+        self, oneof_group: typing_extensions.Literal["partition_schema", b"partition_schema"]
+    ) -> typing_extensions.Literal["partition_schema_string", "partition_schema_struct"] | None: ...
 
 global___ConvertToDelta = ConvertToDelta
 
-@typing.final
 class RestoreTable(google.protobuf.message.Message):
     """Command that restores the DeltaTable to an older version of the table specified by either a
     version number or a timestamp.
@@ -284,13 +288,13 @@ class RestoreTable(google.protobuf.message.Message):
     TABLE_FIELD_NUMBER: builtins.int
     VERSION_FIELD_NUMBER: builtins.int
     TIMESTAMP_FIELD_NUMBER: builtins.int
+    @property
+    def table(self) -> delta.connect.proto.base_pb2.DeltaTable:
+        """(Required) The Delta table to restore to an earlier version."""
     version: builtins.int
     """The version number to restore to."""
     timestamp: builtins.str
     """The timestamp to restore to."""
-    @property
-    def table(self) -> delta.connect.proto.base_pb2.DeltaTable:
-        """(Required) The Delta table to restore to an earlier version."""
     def __init__(
         self,
         *,
@@ -300,7 +304,7 @@ class RestoreTable(google.protobuf.message.Message):
     ) -> None: ...
     def HasField(
         self,
-        field_name: typing.Literal[
+        field_name: typing_extensions.Literal[
             "table",
             b"table",
             "timestamp",
@@ -313,7 +317,7 @@ class RestoreTable(google.protobuf.message.Message):
     ) -> builtins.bool: ...
     def ClearField(
         self,
-        field_name: typing.Literal[
+        field_name: typing_extensions.Literal[
             "table",
             b"table",
             "timestamp",
@@ -325,12 +329,12 @@ class RestoreTable(google.protobuf.message.Message):
         ],
     ) -> None: ...
     def WhichOneof(
-        self, oneof_group: typing.Literal["version_or_timestamp", b"version_or_timestamp"]
-    ) -> typing.Literal["version", "timestamp"] | None: ...
+        self,
+        oneof_group: typing_extensions.Literal["version_or_timestamp", b"version_or_timestamp"],
+    ) -> typing_extensions.Literal["version", "timestamp"] | None: ...
 
 global___RestoreTable = RestoreTable
 
-@typing.final
 class IsDeltaTable(google.protobuf.message.Message):
     """Relation containing a single row containing a single boolean that indicates whether the provided
     path contains a Delta table.
@@ -346,11 +350,10 @@ class IsDeltaTable(google.protobuf.message.Message):
         *,
         path: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["path", b"path"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["path", b"path"]) -> None: ...
 
 global___IsDeltaTable = IsDeltaTable
 
-@typing.final
 class DeleteFromTable(google.protobuf.message.Message):
     """Command that deletes data from the target table that matches the given condition.
 
@@ -376,15 +379,14 @@ class DeleteFromTable(google.protobuf.message.Message):
         condition: pyspark.sql.connect.proto.expressions_pb2.Expression | None = ...,
     ) -> None: ...
     def HasField(
-        self, field_name: typing.Literal["condition", b"condition", "target", b"target"]
+        self, field_name: typing_extensions.Literal["condition", b"condition", "target", b"target"]
     ) -> builtins.bool: ...
     def ClearField(
-        self, field_name: typing.Literal["condition", b"condition", "target", b"target"]
+        self, field_name: typing_extensions.Literal["condition", b"condition", "target", b"target"]
     ) -> None: ...
 
 global___DeleteFromTable = DeleteFromTable
 
-@typing.final
 class UpdateTable(google.protobuf.message.Message):
     """Command that updates data in the target table using the given assignments for rows that matches
     the given condition.
@@ -420,18 +422,17 @@ class UpdateTable(google.protobuf.message.Message):
         assignments: collections.abc.Iterable[global___Assignment] | None = ...,
     ) -> None: ...
     def HasField(
-        self, field_name: typing.Literal["condition", b"condition", "target", b"target"]
+        self, field_name: typing_extensions.Literal["condition", b"condition", "target", b"target"]
     ) -> builtins.bool: ...
     def ClearField(
         self,
-        field_name: typing.Literal[
+        field_name: typing_extensions.Literal[
             "assignments", b"assignments", "condition", b"condition", "target", b"target"
         ],
     ) -> None: ...
 
 global___UpdateTable = UpdateTable
 
-@typing.final
 class Assignment(google.protobuf.message.Message):
     """Represents an assignment of a value to a field."""
 
@@ -452,10 +453,10 @@ class Assignment(google.protobuf.message.Message):
         value: pyspark.sql.connect.proto.expressions_pb2.Expression | None = ...,
     ) -> None: ...
     def HasField(
-        self, field_name: typing.Literal["field", b"field", "value", b"value"]
+        self, field_name: typing_extensions.Literal["field", b"field", "value", b"value"]
     ) -> builtins.bool: ...
     def ClearField(
-        self, field_name: typing.Literal["field", b"field", "value", b"value"]
+        self, field_name: typing_extensions.Literal["field", b"field", "value", b"value"]
     ) -> None: ...
 
 global___Assignment = Assignment
