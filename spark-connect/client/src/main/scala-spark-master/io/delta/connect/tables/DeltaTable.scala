@@ -88,7 +88,7 @@ class DeltaTable private[tables](
    * @param retentionHours The retention threshold in hours. Files required by the table for
    *                       reading versions earlier than this will be preserved and the
    *                       rest of them will be deleted.
-   * @since 2.4.0
+   * @since 4.0.0
    */
   def vacuum(retentionHours: Double): DataFrame = {
     executeVacuum(Some(retentionHours))
@@ -101,7 +101,7 @@ class DeltaTable private[tables](
    *
    * note: This will use the default retention period of 7 days.
    *
-   * @since 2.4.0
+   * @since 4.0.0
    */
   def vacuum(): DataFrame = {
     executeVacuum(None)
@@ -494,7 +494,7 @@ class DeltaTable private[tables](
    *              - "symlink_format_manifest" : This will generate manifests in symlink format
    *                for Presto and Athena read support.
    *                See the online documentation for more information.
-   * @since 2.5.0
+   * @since 4.0.0
    */
   def generate(mode: String): Unit = {
     val generate = proto.Generate
@@ -513,7 +513,7 @@ class DeltaTable private[tables](
    *
    * See online documentation and Delta's protocol specification at PROTOCOL.md for more details.
    *
-   * @since 2.5.0
+   * @since 4.0.0
    */
   def upgradeTableProtocol(readerVersion: Int, writerVersion: Int): Unit = {
     val upgrade = proto.UpgradeTableProtocol
